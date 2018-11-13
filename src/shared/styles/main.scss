@@ -1,0 +1,33 @@
+@import "reset.scss";
+@import url("//use.fontawesome.com/releases/v5.2.0/css/all.css");
+@import url("https://fonts.googleapis.com/css?family=Roboto");
+
+@include reset-css;
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 62.5%;
+  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+  height: 100%;
+}
+
+html,
+body,
+.app-root,
+#root {
+  height: 100%;
+
+  .app {
+    font-family: "Roboto", sans-serif;
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+    overflow: none;
+    height: 100%;
+    word-spacing: 0.05rem;
+    line-height: normal;
+    font-size: 1.2rem;
+  }
+}
