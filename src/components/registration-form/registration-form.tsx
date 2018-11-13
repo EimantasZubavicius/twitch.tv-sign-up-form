@@ -1,10 +1,11 @@
 import * as React from "react";
 
-import "./registration-form.scss";
 import { UsernameComponent } from "../username-component/username-component";
 import { PaswordComponent } from "../password-component/password-component";
 import { DateComponent } from "../date-component/date-component";
 import { EmailComponent } from "../email-component/email-component";
+
+import "./registration-form.scss";
 
 interface State {
   email: string;

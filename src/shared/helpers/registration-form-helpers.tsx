@@ -159,7 +159,6 @@ export function hiddenText(
         <div className="error-message">*Please enter a valid date.</div>
       );
       inputDescription = <div />;
-      break;
     }
   }
   return (

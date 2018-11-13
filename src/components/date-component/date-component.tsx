@@ -78,7 +78,7 @@ export class DateComponent extends React.Component<Props, State> {
       this.setState({
         year: event.target.value
       });
-      if (year < 1903 || year > 2018) {
+      if (year < 1903 || year > 2018 || isNaN(year)) {
         this.props.onInputStatusChange("year", "incorrect");
       } else {
         this.props.onInputStatusChange("year", "correct");
@@ -94,7 +94,7 @@ export class DateComponent extends React.Component<Props, State> {
         day: event.target.value
       });
 
-      if (monthLength[month - 1] < day || day < 1) {
+      if (monthLength[month - 1] < day || day < 1 || isNaN(day)) {
         this.props.onInputStatusChange("day", "incorrect");
       } else {
         this.props.onInputStatusChange("day", "correct");
