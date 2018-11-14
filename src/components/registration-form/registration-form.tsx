@@ -8,8 +8,6 @@ import { EmailComponent } from "../email-component/email-component";
 import "./registration-form.scss";
 
 interface State {
-  email: string;
-
   inputFocused: boolean;
   inputDict: Inputs<string>;
   inputErrorDict: Inputs<string>;
@@ -17,7 +15,6 @@ interface State {
 
 export class RegistrationFormView extends React.Component<{}, State> {
   public state: State = {
-    email: "",
     inputFocused: false,
     inputDict: {},
     inputErrorDict: {}
