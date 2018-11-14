@@ -152,9 +152,7 @@ export function hiddenText(
       );
       break;
     }
-    case "month":
-    case "day":
-    case "year": {
+    case "date": {
       errorMessage = (
         <div className="error-message">*Please enter a valid date.</div>
       );

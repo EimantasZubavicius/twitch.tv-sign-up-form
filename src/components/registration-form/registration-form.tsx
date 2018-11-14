@@ -30,6 +30,14 @@ export class RegistrationFormView extends React.Component<{}, State> {
 
   private onInputFocus: React.ChangeEventHandler<HTMLInputElement> = event => {
     const name = event.target.name;
+    if (name === "day" || name === "year") {
+      this.setState(state => {
+        {
+          state.inputDict["date"] = "focused";
+          return state;
+        }
+      });
+    }
     this.setState(state => {
       {
         state.inputDict[name] = "focused";
@@ -40,6 +48,14 @@ export class RegistrationFormView extends React.Component<{}, State> {
 
   private onInputBlur: React.ChangeEventHandler<HTMLInputElement> = event => {
     const name = event.target.name;
+    if (name === "day" || name === "year") {
+      this.setState(state => {
+        {
+          state.inputDict["date"] = "blured";
+          return state;
+        }
+      });
+    }
     this.setState(state => {
       {
         state.inputDict[name] = "blured";

@@ -46,10 +46,15 @@ export class DateComponent extends React.Component<Props, State> {
       monthLength[1] = 29;
     }
 
-    if (this.state.day !== "" && monthLength[month - 1] < parseInt(this.state.day)) {
+    if (
+      this.state.day !== "" &&
+      monthLength[month - 1] < parseInt(this.state.day)
+    ) {
       this.props.onInputStatusChange("day", "incorrect");
+      this.props.onInputStatusChange("date", "incorrect");
     } else {
       this.props.onInputStatusChange("day", "correct");
+      this.props.onInputStatusChange("date", "correct");
     }
   };
 
@@ -81,14 +86,18 @@ export class DateComponent extends React.Component<Props, State> {
 
       if (year < 1903 || year > 2018 || isNaN(year)) {
         this.props.onInputStatusChange("year", "incorrect");
+        this.props.onInputStatusChange("date", "incorrect");
       } else {
         this.props.onInputStatusChange("year", "correct");
+        this.props.onInputStatusChange("date", "correct");
       }
 
       if (monthLength[month - 1] < day || day < 1) {
         this.props.onInputStatusChange("day", "incorrect");
+        this.props.onInputStatusChange("date", "incorrect");
       } else {
         this.props.onInputStatusChange("day", "correct");
+        this.props.onInputStatusChange("date", "correct");
       }
     } else if (type === "day") {
       this.setState({
@@ -97,27 +106,17 @@ export class DateComponent extends React.Component<Props, State> {
 
       if (monthLength[month - 1] < day || day < 1 || isNaN(day)) {
         this.props.onInputStatusChange("day", "incorrect");
+        this.props.onInputStatusChange("date", "incorrect");
       } else {
         this.props.onInputStatusChange("day", "correct");
+        this.props.onInputStatusChange("date", "correct");
       }
     }
   }
 
-  private whichDateIncorrect(): JSX.Element {
-    if (this.props.inputErrorDict["day"] === "incorrect") {
-      return hiddenText("day", this.props.inputDict, this.props.inputErrorDict);
-    } else if (this.props.inputErrorDict["month"] === "incorrect") {
-      return hiddenText(
-        "month",
-        this.props.inputDict,
-        this.props.inputErrorDict
-      );
-    } else if (this.props.inputErrorDict["year"] === "incorrect") {
-      return hiddenText(
-        "year",
-        this.props.inputDict,
-        this.props.inputErrorDict
-      );
+  private isDateCorrect(): JSX.Element {
+    if (this.props.inputErrorDict["date"] === "incorrect") {
+      return hiddenText("date", this.props.inputDict, this.props.inputErrorDict);
     }
   }
 
@@ -186,7 +185,7 @@ export class DateComponent extends React.Component<Props, State> {
             />
           </div>
         </div>
-        {this.whichDateIncorrect()}
+        {this.isDateCorrect()}
       </div>
     );
   }
