@@ -46,7 +46,7 @@ export class DateComponent extends React.Component<Props, State> {
       monthLength[1] = 29;
     }
 
-    if (monthLength[month - 1] < parseInt(this.state.day)) {
+    if (this.state.day !== "" && monthLength[month - 1] < parseInt(this.state.day)) {
       this.props.onInputStatusChange("day", "incorrect");
     } else {
       this.props.onInputStatusChange("day", "correct");
@@ -78,6 +78,7 @@ export class DateComponent extends React.Component<Props, State> {
       this.setState({
         year: event.target.value
       });
+
       if (year < 1903 || year > 2018 || isNaN(year)) {
         this.props.onInputStatusChange("year", "incorrect");
       } else {
@@ -134,8 +135,8 @@ export class DateComponent extends React.Component<Props, State> {
             onChange={this.setMonth}
             className={
               this.props.inputErrorDict["month"] === "incorrect"
-                ? "input-field date username-input wrong"
-                : "input-field date username-input"
+                ? "input-field date month-input wrong"
+                : "input-field date month-input"
             }
           >
             <option value="0" hidden>

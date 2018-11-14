@@ -4,18 +4,17 @@ import { UsernameComponent } from "../username-component/username-component";
 import { PaswordComponent } from "../password-component/password-component";
 import { DateComponent } from "../date-component/date-component";
 import { EmailComponent } from "../email-component/email-component";
+import { SubmitComponent } from "../submit-component/submit-component";
 
 import "./registration-form.scss";
 
 interface State {
-  inputFocused: boolean;
   inputDict: Inputs<string>;
   inputErrorDict: Inputs<string>;
 }
 
 export class RegistrationFormView extends React.Component<{}, State> {
   public state: State = {
-    inputFocused: false,
     inputDict: {},
     inputErrorDict: {}
   };
@@ -89,13 +88,7 @@ export class RegistrationFormView extends React.Component<{}, State> {
             inputDict={this.state.inputDict}
             inputErrorDict={this.state.inputErrorDict}
           />
-        </div>
-        <div className="tos-button">
-          <div className="tos">
-            By clicking Sign Up, you are indicating that you have read and agree
-            to the Terms of Service and Privacy Policy.
-          </div>
-          <button className="sign-up">Sign Up</button>
+          <SubmitComponent inputErrorDict={this.state.inputErrorDict} />
         </div>
       </div>
     );

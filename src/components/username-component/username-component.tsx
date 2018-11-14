@@ -4,7 +4,6 @@ import { hiddenText } from "../../shared/helpers/registration-form-helpers";
 
 interface State {
   username: string;
-  inputFocused: boolean;
 }
 
 interface Props {
@@ -17,8 +16,7 @@ interface Props {
 
 export class UsernameComponent extends React.Component<Props, State> {
   public state: State = {
-    username: "",
-    inputFocused: false
+    username: ""
   };
 
   private onUsernameInput: React.ChangeEventHandler<
@@ -42,7 +40,11 @@ export class UsernameComponent extends React.Component<Props, State> {
           ) : null}
         </div>
         <input
-          className="input-field full-width username-input"
+          className={
+            this.props.inputErrorDict["username"] === "incorrect"
+              ? "input-field date username-input wrong"
+              : "input-field date username-input"
+          }
           name="username"
           onChange={this.onUsernameInput}
           value={this.state.username}

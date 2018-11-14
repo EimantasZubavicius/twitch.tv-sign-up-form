@@ -86,10 +86,24 @@
       background: rgba(0, 0, 0, 0.05);
       border-color: rgba(0, 0, 0, 0.05);
       box-shadow: none;
-      color: #6e6779;
       border-radius: 4px;
       height: 3rem;
       width: 100%;
+    }
+
+    .enabled {
+      background: #7d5bbe;
+      color: white;
+      cursor: pointer;
+
+      &:hover{
+        background: #a58ed1;
+      }
+    }
+
+    .disabled {
+      background: rgba(0, 0, 0, 0.05);
+      cursor: not-allowed;
     }
 
     .tos {
@@ -97,6 +111,12 @@
       margin-bottom: 2;
       text-align: center;
       line-height: 1.5rem;
+
+      a {
+        text-decoration: none;
+        color: #7d5bbe;
+        margin: 0 2px;
+      }
     }
   }
 
@@ -165,6 +185,7 @@
         padding-left: 1rem;
         font-size: 1.2rem;
         width: 100%;
+        transition: all 0.2s linear;
 
         &:focus {
           border-color: #7d5bbe;
@@ -174,6 +195,7 @@
       }
 
       .wrong {
+        transition: all 0.2s linear;
         border: 2px solid rgb(252, 0, 0);
 
         &:focus {
@@ -195,7 +217,6 @@
           visibility: hidden;
           transition: opacity 0.3s ease-in-out;
           opacity: 0.2;
-
         }
 
         .nonhidden {
@@ -203,7 +224,7 @@
           opacity: 0.8;
         }
 
-        .error-message{
+        .error-message {
           color: rgb(252, 0, 0);
         }
       }
