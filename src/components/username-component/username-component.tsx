@@ -1,62 +1,69 @@
 import * as React from "react";
+import classNames from "classnames";
 
-import { hiddenText } from "../../shared/helpers/registration-form-helpers";
+import { FieldStatus } from "../../shared/contracts/field-status";
+import { SignOptions } from "../../shared/contracts/signup-options";
 
 interface State {
-  username: string;
+    focused: boolean;
 }
 
 interface Props {
-  onInputFocus: React.ChangeEventHandler<HTMLInputElement>;
-  onInputBlur: React.ChangeEventHandler<HTMLInputElement>;
-  onInputStatusChange(type: string, status: string): void;
-  inputDict: Inputs<string>;
-  inputErrorDict: Inputs<string>;
+    onChange: React.ChangeEventHandler<HTMLInputElement>;
+    value: string;
+    name: string;
+    fieldStatus: FieldStatus;
+    option?: SignOptions;
 }
 
 export class UsernameComponent extends React.Component<Props, State> {
-  public state: State = {
-    username: ""
-  };
+    public state: State = {
+        focused: false
+    };
 
-  private onUsernameInput: React.ChangeEventHandler<
-    HTMLInputElement
-  > = event => {
-    this.setState({ username: event.target.value });
-    if (event.target.value.length > 3) {
-      this.props.onInputStatusChange("username", "correct");
-    } else {
-      this.props.onInputStatusChange("username", "incorrect");
+    private onInputChange: React.ChangeEventHandler<HTMLInputElement> = event => {
+        event.persist();
+        this.props.onChange(event);
+    };
+
+    private onInputFocus: React.FocusEventHandler<HTMLInputElement> = event => {
+        this.setState({ focused: true });
+    };
+
+    private onInputBlur: React.FocusEventHandler<HTMLInputElement> = event => {
+        this.setState({ focused: false });
+    };
+
+    public render(): JSX.Element {
+        const inputDescription = <div>This is the name people will know you by on this website. You can always change it later.</div>;
+        const errorMessage = <div className="error-message">*This username is unavailable.</div>;
+
+        return (
+            <div className="parameter username">
+                <div className="username-label-wrapper label-wrapper">
+                    <div className="username-label label">Username</div>
+                    {this.props.option === SignOptions.SignUp ? (
+                        this.props.fieldStatus === FieldStatus.Correct ? (
+                            <div className="fas fa-check-circle icon strong" />
+                        ) : null
+                    ) : null}
+                </div>
+                <input
+                    className={classNames("input-field date username-input", { wrong: this.props.fieldStatus === FieldStatus.Incorrect })}
+                    name={this.props.name}
+                    onChange={this.onInputChange}
+                    value={this.props.value}
+                    onFocus={this.onInputFocus}
+                    onBlur={this.onInputBlur}
+                />
+                {this.props.option === SignOptions.SignUp ? (
+                    <div className={classNames("animation-target", { full: this.state.focused })}>
+                        <div className={classNames("hidden-text", { nonhidden: this.state.focused })}>
+                            {this.props.fieldStatus === FieldStatus.Incorrect ? errorMessage : inputDescription}
+                        </div>
+                    </div>
+                ) : null}
+            </div>
+        );
     }
-  };
-
-  public render(): JSX.Element {
-    return (
-      <div className="parameter username">
-        <div className="username-label-wrapper label-wrapper">
-          <div className="username-label label">Username</div>
-          {this.props.inputErrorDict["username"] === "correct" ? (
-            <div className="fas fa-check-circle icon strong" />
-          ) : null}
-        </div>
-        <input
-          className={
-            this.props.inputErrorDict["username"] === "incorrect"
-              ? "input-field date username-input wrong"
-              : "input-field date username-input"
-          }
-          name="username"
-          onChange={this.onUsernameInput}
-          value={this.state.username}
-          onFocus={this.props.onInputFocus}
-          onBlur={this.props.onInputBlur}
-        />
-        {hiddenText(
-          "username",
-          this.props.inputDict,
-          this.props.inputErrorDict
-        )}
-      </div>
-    );
-  }
 }

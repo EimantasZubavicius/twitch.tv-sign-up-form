@@ -1,58 +1,63 @@
 import * as React from "react";
+import classNames from "classnames";
 
-import { hiddenText } from "../../shared/helpers/registration-form-helpers";
+import { FieldStatus } from "../../shared/contracts/field-status";
 
 interface State {
-  email: string;
+    focused: boolean;
 }
 
 interface Props {
-  onInputFocus: React.ChangeEventHandler<HTMLInputElement>;
-  onInputBlur: React.ChangeEventHandler<HTMLInputElement>;
-  onInputStatusChange(type: string, status: string): void;
-  inputDict: Inputs<string>;
-  inputErrorDict: Inputs<string>;
+    onChange: React.ChangeEventHandler<HTMLInputElement>;
+    value: string;
+    name: string;
+    fieldStatus: FieldStatus;
 }
 
 export class EmailComponent extends React.Component<Props, State> {
-  public state: State = {
-    email: ""
-  };
+    public state: State = {
+        focused: false
+    };
 
-  private onEmailInput: React.ChangeEventHandler<HTMLInputElement> = event => {
-    const pattern = /\S+@\S+\.\S+/;
+    private onEmailInput: React.ChangeEventHandler<HTMLInputElement> = event => {
+        event.persist();
+        this.props.onChange(event);
+    };
 
-    this.setState({ email: event.target.value });
-    if (pattern.test(this.state.email)) {
-      this.props.onInputStatusChange("email", "correct");
-    } else {
-      this.props.onInputStatusChange("email", "incorrect");
+    private onInputFocus: React.FocusEventHandler<HTMLInputElement> = event => {
+        this.setState({ focused: true });
+    };
+
+    private onInputBlur: React.FocusEventHandler<HTMLInputElement> = event => {
+        this.setState({ focused: false });
+    };
+
+    public render(): JSX.Element {
+        const inputDescription = <div>You'll need to verify that you own this email account.</div>;
+        const errorMessage = <div className="error-message">*Please enter a valid email.</div>;
+
+        return (
+            <div className="parameter email">
+                <div className="email-label-wrapper label-wrapper">
+                    <div className="email-label label">Email</div>
+                    {this.props.fieldStatus === FieldStatus.Correct ? <div className="fas fa-check-circle icon strong" /> : null}
+                </div>
+                <input
+                    className={classNames("input-field full-width email-input", {
+                        wrong: this.props.fieldStatus === FieldStatus.Incorrect
+                    })}
+                    onChange={this.onEmailInput}
+                    value={this.props.value}
+                    onFocus={this.onInputFocus}
+                    onBlur={this.onInputBlur}
+                    name={this.props.name}
+                />
+                <div className={classNames("animation-target", { full: this.state.focused })}>
+                    <div className={classNames("hidden-text", { nonhidden: this.state.focused })}>
+                        {this.props.fieldStatus === FieldStatus.Incorrect ? errorMessage : inputDescription}
+                    </div>
+                </div>
+            </div>
+        );
     }
-  };
-
-  public render(): JSX.Element {
-    return (
-      <div className="parameter email">
-        <div className="email-label-wrapper label-wrapper">
-          <div className="email-label label">Email</div>
-          {this.props.inputErrorDict["email"] === "correct" ? (
-            <div className="fas fa-check-circle icon strong" />
-          ) : null}
-        </div>
-        <input
-          className={
-            this.props.inputErrorDict["email"] === "incorrect"
-              ? "input-field full-width email-input wrong"
-              : "input-field full-width email-input"
-          }
-          onChange={this.onEmailInput}
-          value={this.state.email}
-          onFocus={this.props.onInputFocus}
-          onBlur={this.props.onInputBlur}
-          name="email"
-        />
-        {hiddenText("email", this.props.inputDict, this.props.inputErrorDict)}
-      </div>
-    );
-  }
 }

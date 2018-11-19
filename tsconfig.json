@@ -12,6 +12,9 @@
         "noEmitHelpers": true,
         "importHelpers": true,
         "skipLibCheck": true,
+        "strict": true,
+        "noUnusedLocals": true,
+        "pretty": true,
         "target": "es5",
         "lib": ["es6", "dom"],
         "plugins": [
