@@ -1,31 +1,52 @@
 {
-    "name": "react-boilerplate",
-    "private": true,
-    "scripts": {
-        "test": "tsc -p . --noEmit && tslint -p .",
-        "build": "webpack --config webpack.config.js",
-        "build:prod": "npm run build -- --mode=production",
-        "watch": "webpack-dev-server"
-    },
-    "license": "MIT",
-    "devDependencies": {
-        "@simplrjs/webpack": "0.1.0-alpha.14",
-        "@types/webpack": "^4.4.10",
-        "simplr-tslint": "^1.0.0-alpha.14",
-        "tslint": "^5.11.0",
-        "tslint-language-service": "^0.9.9",
-        "typescript": "^3.0.1",
-        "webpack": "^4.16.5",
-        "webpack-cli": "^3.1.0",
-        "webpack-dev-server": "^3.1.10"
-    },
-    "dependencies": {
-        "@fortawesome/fontawesome-free": "^5.5.0",
-        "@types/classnames": "^2.2.6",
-        "@types/react": "^16.4.11",
-        "@types/react-dom": "^16.0.7",
-        "classnames": "^2.2.6",
-        "react": "^16.4.2",
-        "react-dom": "^16.4.2"
-    }
+  "name": "test-environment",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "test": "tsc -p . --noEmit && tslint -p .",
+    "start": "npm run watch",
+    "watch:prod": "cross-env NODE_ENV=production webpack-dev-server --config webpack.config.js",
+    "watch": "cross-env NODE_ENV=development webpack-dev-server --config webpack.config.js",
+    "build:prod": "cross-env NODE_ENV=production webpack --config webpack.config.js",
+    "build": "webpack --config webpack.config.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@reactway/webpack-builder": "1.0.0-alpha.14",
+    "@reactway/webpack-builder-plugin-clean": "1.0.0-alpha.14",
+    "@reactway/webpack-builder-plugin-html": "1.0.0-alpha.14",
+    "@reactway/webpack-builder-plugin-images": "1.0.0-alpha.14",
+    "@reactway/webpack-builder-plugin-styles": "1.0.0-alpha.14",
+    "@reactway/webpack-builder-plugin-typescript": "1.0.0-alpha.14",
+    "@reactway/webpack-builder-plugin-web-dev": "1.0.0-alpha.14",
+    "@reactway/webpack-builder-plugin-write-file": "1.0.0-alpha.14",
+    "@types/classnames": "^2.2.7",
+    "@types/history": "^4.7.2",
+    "@types/react": "^16.8.18",
+    "@types/react-dom": "^16.8.4",
+    "@types/react-router": "^5.0.1",
+    "@types/react-router-dom": "^4.3.3",
+    "@types/webpack": "^4.4.32",
+    "cross-env": "^5.2.0",
+    "html-webpack-template": "^6.2.0",
+    "node-sass": "^4.12.0",
+    "simplr-tslint": "1.0.0-alpha.14",
+    "tslint": "^5.16.0",
+    "tslint-language-service": "^0.9.9",
+    "typescript": "^3.4.5",
+    "webpack-cli": "^3.3.2",
+    "webpack-dev-server": "^3.4.1"
+  },
+  "dependencies": {
+    "classnames": "^2.2.6",
+    "history": "^4.9.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-router": "^5.0.0",
+    "react-router-dom": "^5.0.0",
+    "webpack": "^4.32.2"
+  }
 }

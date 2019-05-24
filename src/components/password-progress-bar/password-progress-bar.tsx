@@ -1,28 +1,18 @@
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import classNames from "classnames";
 
 import { PasswordStrength } from "../../shared/contracts/password-strength";
 import { getPasswordStrength } from "../../shared/helpers/registration-form-helpers";
 
-interface State {
-    passwordStrength: PasswordStrength;
-}
-
 interface Props {
     password: string;
 }
 
-export class PasswordProgressBar extends React.Component<Props, State> {
-    public state: State = {
-        passwordStrength: PasswordStrength.Empty
-    };
+export const PasswordProgressBar = (props: Props): JSX.Element => {
+    const [passwordStrength, setPasswordStrength] = useState(PasswordStrength.Empty);
 
-    public static getDerivedStateFromProps(props: Props, state: State): State {
-        return { passwordStrength: getPasswordStrength(props.password) };
-    }
-
-    private renderProgressBarText(): string {
-        switch (this.state.passwordStrength) {
+    const renderProgressBarText = (): string => {
+        switch (passwordStrength) {
             case PasswordStrength.Weak: {
                 return "Weak";
             }
@@ -43,48 +33,44 @@ export class PasswordProgressBar extends React.Component<Props, State> {
                 return "";
             }
         }
-    }
+    };
 
-    public render(): JSX.Element {
-        return (
-            <div
-                className={classNames("bar-wrapper", {
-                    weak:
-                        this.state.passwordStrength === PasswordStrength.Weak || this.state.passwordStrength === PasswordStrength.VeryWeak,
-                    strong:
-                        this.state.passwordStrength === PasswordStrength.Strong ||
-                        this.state.passwordStrength === PasswordStrength.VeryStrong,
-                    bad: this.state.passwordStrength === PasswordStrength.Bad,
-                    empty: this.state.passwordStrength === PasswordStrength.Empty
-                })}
-            >
-                {this.state.passwordStrength === PasswordStrength.Empty ? null : (
-                    <div
-                        className={classNames("fas icon", {
-                            "fa-check-circle":
-                                this.state.passwordStrength === PasswordStrength.Strong ||
-                                this.state.passwordStrength === PasswordStrength.VeryStrong,
-                            "fa-exclamation-triangle":
-                                this.state.passwordStrength === PasswordStrength.Weak ||
-                                this.state.passwordStrength === PasswordStrength.VeryWeak,
-                            "fa-times-circle": this.state.passwordStrength === PasswordStrength.Bad
-                        })}
-                    />
-                )}
-                <div className="level">{this.renderProgressBarText()}</div>
-                <div className="progress-bar">
-                    <div
-                        className={classNames("filler", {
-                            "very-weak": this.state.passwordStrength === PasswordStrength.VeryWeak,
-                            weak: this.state.passwordStrength === PasswordStrength.Weak,
-                            strong: this.state.passwordStrength === PasswordStrength.Strong,
-                            "very-strong": this.state.passwordStrength === PasswordStrength.VeryStrong,
-                            bad: this.state.passwordStrength === PasswordStrength.Bad,
-                            empty: this.state.passwordStrength === PasswordStrength.Empty
-                        })}
-                    />
-                </div>
+    useEffect(() => {
+        setPasswordStrength(getPasswordStrength(props.password));
+    }, [props.password]);
+
+    return (
+        <div
+            className={classNames("bar-wrapper", {
+                weak: passwordStrength === PasswordStrength.Weak || passwordStrength === PasswordStrength.VeryWeak,
+                strong: passwordStrength === PasswordStrength.Strong || passwordStrength === PasswordStrength.VeryStrong,
+                bad: passwordStrength === PasswordStrength.Bad,
+                empty: passwordStrength === PasswordStrength.Empty
+            })}
+        >
+            {passwordStrength === PasswordStrength.Empty ? null : (
+                <div
+                    className={classNames("fas icon", {
+                        "fa-check-circle": passwordStrength === PasswordStrength.Strong || passwordStrength === PasswordStrength.VeryStrong,
+                        "fa-exclamation-triangle":
+                            passwordStrength === PasswordStrength.Weak || passwordStrength === PasswordStrength.VeryWeak,
+                        "fa-times-circle": passwordStrength === PasswordStrength.Bad
+                    })}
+                />
+            )}
+            <div className="level">{renderProgressBarText()}</div>
+            <div className="progress-bar">
+                <div
+                    className={classNames("filler", {
+                        "very-weak": passwordStrength === PasswordStrength.VeryWeak,
+                        weak: passwordStrength === PasswordStrength.Weak,
+                        strong: passwordStrength === PasswordStrength.Strong,
+                        "very-strong": passwordStrength === PasswordStrength.VeryStrong,
+                        bad: passwordStrength === PasswordStrength.Bad,
+                        empty: passwordStrength === PasswordStrength.Empty
+                    })}
+                />
             </div>
-        );
-    }
-}
+        </div>
+    );
+};

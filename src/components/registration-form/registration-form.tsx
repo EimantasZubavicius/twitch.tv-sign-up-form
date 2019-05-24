@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState } from "react";
 
 import { DateComponent } from "../date-component/date-component";
 import { EmailComponent } from "../email-component/email-component";
@@ -26,135 +26,117 @@ interface FormFields {
     email: string;
 }
 
-interface State {
-    inputDict: Inputs<string>;
-    inputErrorDict: Inputs<string>;
-    validFields: Dictionary<UserDto, FieldStatus>;
-    formFields: UserDto;
-    formValid: boolean;
-}
-
 interface Props {
-    setOption(option: SignOptions, event: React.MouseEvent<HTMLLIElement>): void;
+    setOption(option: SignOptions): void;
     option: SignOptions;
 }
 
-export class RegistrationFormView extends React.Component<Props, State> {
-    public state: State = {
-        inputDict: {},
-        inputErrorDict: {},
-        validFields: {
-            day: FieldStatus.Initialized,
-            month: FieldStatus.Initialized,
-            year: FieldStatus.Initialized,
-            email: FieldStatus.Initialized,
-            password: FieldStatus.Initialized,
-            username: FieldStatus.Initialized
-        },
-        formFields: {
-            day: "",
-            month: "0",
-            year: "",
-            email: "",
-            password: "",
-            username: ""
-        },
-        formValid: false
-    };
+export const RegistrationFormView = (props: Props): JSX.Element => {
+    const [validFields, setValidFields] = useState<Dictionary<UserDto, FieldStatus>>({
+        day: FieldStatus.Initialized,
+        month: FieldStatus.Initialized,
+        year: FieldStatus.Initialized,
+        email: FieldStatus.Initialized,
+        password: FieldStatus.Initialized,
+        username: FieldStatus.Initialized
+    });
+    const [formFields, setFormFields] = useState<UserDto>({
+        day: "",
+        month: "0",
+        year: "",
+        email: "",
+        password: "",
+        username: ""
+    });
+    const [formValid, setFormValid] = useState(false);
 
-    private onFieldChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const onFieldChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const fieldName = event.currentTarget.name;
         const fieldValue = event.currentTarget.value;
 
-        this.setState(state => {
-            state.formFields[fieldName] = fieldValue;
-            return RegistrationFormView.calculateState(state);
-        });
-    };
+        const newFormFields = formFields;
+        newFormFields[fieldName] = fieldValue;
 
-    private static calculateState(state: State): State {
-        const nextState: State = {
-            ...state,
-            validFields: {
-                username: isUsernameOrPasswordValid(state.formFields.username, 3),
-                password: isUsernameOrPasswordValid(state.formFields.password, 7),
-                month: isMonthValid(state.formFields.month),
-                day: isDayValid(state.formFields.day, state.formFields.month, state.formFields.year),
-                year: isYearValid(state.formFields.year),
-                email: isEmailValid(state.formFields.email)
-            }
+        setFormFields(newFormFields);
+
+        const nextValidFields: Dictionary<UserDto, FieldStatus> = {
+            username: isUsernameOrPasswordValid(formFields.username, 3),
+            password: isUsernameOrPasswordValid(formFields.password, 7),
+            month: isMonthValid(formFields.month),
+            day: isDayValid(formFields.day, formFields.month, formFields.year),
+            year: isYearValid(formFields.year),
+            email: isEmailValid(formFields.email)
         };
 
-        nextState.formValid = Object.keys(nextState.validFields)
-            .map(x => nextState.validFields[x])
-            .every(x => x === FieldStatus.Correct);
-        return nextState;
-    }
+        setValidFields(nextValidFields);
 
-    private onFormSubmit: React.MouseEventHandler<HTMLFormElement> = event => {
-        event.preventDefault();
-
-        console.info("fields", this.state.formFields);
+        setFormValid(
+            Object.keys(nextValidFields)
+            .map(x => nextValidFields[x])
+            .every(x => x === FieldStatus.Correct)
+        );
     };
 
-    private getFieldName(name: keyof FormFields): string {
-        return name;
-    }
+    const onFormSubmit: React.MouseEventHandler<HTMLFormElement> = event => {
+        event.preventDefault();
 
-    public render(): JSX.Element {
-        return (
-            <form className="registration-container" onSubmit={this.onFormSubmit}>
-                <LoginOptionsView setOption={this.props.setOption} option={this.props.option} />
-                <div className="container user-details-container">
-                    <UsernameComponent
-                        onChange={this.onFieldChange}
-                        name={this.getFieldName("username")}
-                        value={this.state.formFields.username}
-                        fieldStatus={this.state.validFields.username}
-                        option={this.props.option}
-                    />
-                    <PasswordComponent
-                        name={this.getFieldName("password")}
-                        value={this.state.formFields.password}
-                        onChange={this.onFieldChange}
-                        fieldStatus={this.state.validFields.password}
-                        option={this.props.option}
-                    />
-                    <DateComponent
-                        onInputChange={this.onFieldChange}
-                        onSelectChange={this.onFieldChange}
-                        dayInputName={this.getFieldName("day")}
-                        monthInputName={this.getFieldName("month")}
-                        yearInputName={this.getFieldName("year")}
-                        dayValue={this.state.formFields.day}
-                        monthValue={this.state.formFields.month}
-                        yearValue={this.state.formFields.year}
-                        dayFieldStatus={this.state.validFields.day}
-                        monthFieldStatus={this.state.validFields.month}
-                        yearFieldStatus={this.state.validFields.year}
-                    />
-                    <EmailComponent
-                        name={this.getFieldName("email")}
-                        value={this.state.formFields.email}
-                        onChange={this.onFieldChange}
-                        fieldStatus={this.state.validFields.email}
-                    />
-                    <div className="tos-button">
-                        <div className="tos">
-                            By clicking Sign Up, you are indicating that you have read and agree to the
-                            <a href="https://www.twitch.tv/p/legal/terms-of-service/">Terms of Service</a>
-                            and
-                            <a href="https://www.twitch.tv/p/legal/privacy-policy/">Privacy Policy.</a>
-                        </div>
-                        <input
-                            className={this.state.formValid ? "sign-up enabled" : "sign-up disabled"}
-                            type="submit"
-                            value="Sign Up"
-                            disabled={!this.state.formValid}
-                        />
+        console.info("fields", formFields);
+    };
+
+    const getFieldName = (name: keyof FormFields): string => name;
+
+    return (
+        <form className="registration-container" onSubmit={onFormSubmit}>
+            <LoginOptionsView setOption={props.setOption} option={props.option} />
+            <div className="container user-details-container">
+                <UsernameComponent
+                    onChange={onFieldChange}
+                    name={getFieldName("username")}
+                    value={formFields.username}
+                    fieldStatus={validFields.username}
+                    option={props.option}
+                />
+                <PasswordComponent
+                    name={getFieldName("password")}
+                    value={formFields.password}
+                    onChange={onFieldChange}
+                    fieldStatus={validFields.password}
+                    option={props.option}
+                />
+                <DateComponent
+                    onInputChange={onFieldChange}
+                    onSelectChange={onFieldChange}
+                    dayInputName={getFieldName("day")}
+                    monthInputName={getFieldName("month")}
+                    yearInputName={getFieldName("year")}
+                    dayValue={formFields.day}
+                    monthValue={formFields.month}
+                    yearValue={formFields.year}
+                    dayFieldStatus={validFields.day}
+                    monthFieldStatus={validFields.month}
+                    yearFieldStatus={validFields.year}
+                />
+                <EmailComponent
+                    name={getFieldName("email")}
+                    value={formFields.email}
+                    onChange={onFieldChange}
+                    fieldStatus={validFields.email}
+                />
+                <div className="tos-button">
+                    <div className="tos">
+                        By clicking Sign Up, you are indicating that you have read and agree to the
+                        <a href="https://www.twitch.tv/p/legal/terms-of-service/">Terms of Service</a>
+                        and
+                        <a href="https://www.twitch.tv/p/legal/privacy-policy/">Privacy Policy.</a>
                     </div>
+                    <input
+                        className={formValid ? "sign-up enabled" : "sign-up disabled"}
+                        type="submit"
+                        value="Sign Up"
+                        disabled={!formValid}
+                    />
                 </div>
-            </form>
-        );
-    }
-}
+            </div>
+        </form>
+    );
+};

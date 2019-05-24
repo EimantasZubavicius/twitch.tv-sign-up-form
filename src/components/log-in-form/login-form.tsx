@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState } from "react";
 
 import { UsernameComponent } from "../username-component/username-component";
 import { PasswordComponent } from "../password-component/password-component";
@@ -14,100 +14,84 @@ interface FormFields {
     password: string;
 }
 
-interface State {
-    inputDict: Inputs<string>;
-    inputErrorDict: Inputs<string>;
-    validFields: Dictionary<UserLoginDto, FieldStatus>;
-    formFields: UserLoginDto;
-    formValid: boolean;
-}
-
 interface Props {
-    setOption(option: SignOptions, event: React.MouseEvent<HTMLLIElement>): void;
+    setOption(option: SignOptions): void;
     option: SignOptions;
 }
-export class LoginFormView extends React.Component<Props, State> {
-    public state: State = {
-        inputDict: {},
-        inputErrorDict: {},
-        validFields: {
-            password: FieldStatus.Initialized,
-            username: FieldStatus.Initialized
-        },
-        formFields: {
-            password: "",
-            username: ""
-        },
-        formValid: false
-    };
+export const LoginFormView = (props: Props): JSX.Element => {
+    const [validFields, setValidFields] = useState<Dictionary<UserLoginDto, FieldStatus>>({
+        password: FieldStatus.Initialized,
+        username: FieldStatus.Initialized
+    });
+    const [formFields, setFormFields] = useState<UserLoginDto>({
+        password: "",
+        username: ""
+    });
+    const [formValid, setFormValid] = useState(false);
 
-    private onFieldChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const onFieldChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const fieldName = event.currentTarget.name;
         const fieldValue = event.currentTarget.value;
 
-        this.setState(state => {
-            state.formFields[fieldName] = fieldValue;
-            return LoginFormView.calculateState(state);
-        });
-    };
-
-    private static calculateState(state: State): State {
-        const nextState: State = {
-            ...state,
-            validFields: {
-                username: isUsernameOrPasswordValid(state.formFields.username, 3),
-                password: isUsernameOrPasswordValid(state.formFields.password, 7)
-            }
+        const nextValidFields = {
+            username: isUsernameOrPasswordValid(formFields.username, 3),
+            password: isUsernameOrPasswordValid(formFields.password, 7)
         };
 
-        nextState.formValid = Object.keys(nextState.validFields)
-            .map(x => nextState.validFields[x])
-            .every(x => x === FieldStatus.Correct);
-        return nextState;
-    }
+        const newFormFields = formFields;
+        newFormFields[fieldName] = fieldValue;
 
-    private onFormSubmit: React.MouseEventHandler<HTMLFormElement> = event => {
-        event.preventDefault();
+        setFormFields(newFormFields);
 
-        console.info("fields", this.state.formFields);
+        setValidFields(nextValidFields);
+
+        setFormValid(isFormValid(nextValidFields));
     };
 
-    private getFieldName(name: keyof FormFields): string {
-        return name;
-    }
+    const isFormValid = (nextValidFields: Dictionary<UserLoginDto, FieldStatus>) => {
+        return Object.keys(nextValidFields)
+            .map(x => nextValidFields[x])
+            .every(x => x === FieldStatus.Correct);
+    };
 
-    public render(): JSX.Element {
-        return (
-            <form className="registration-container" onSubmit={this.onFormSubmit}>
-                <LoginOptionsView setOption={this.props.setOption} option={this.props.option} />
-                <div className="container user-details-container">
-                    <UsernameComponent
-                        onChange={this.onFieldChange}
-                        name={this.getFieldName("username")}
-                        value={this.state.formFields.username}
-                        fieldStatus={this.state.validFields.username}
-                    />
-                    <PasswordComponent
-                        name={this.getFieldName("password")}
-                        value={this.state.formFields.password}
-                        onChange={this.onFieldChange}
-                        fieldStatus={this.state.validFields.password}
-                    />
-                    <div className="tos-button">
-                        <div className="tos">
-                            <a href="https://passport.twitch.tv/password_resets/new?client_id=kimne78kx3ncx6brgo4mv6wki5h1ko">
-                                Trouble logging in?
-                            </a>
-                        </div>
-                        <input
-                            className={this.state.formValid ? "sign-up enabled" : "sign-up disabled"}
-                            type="submit"
-                            value="Log In"
-                            disabled={!this.state.formValid}
-                        />
+    const onFormSubmit: React.MouseEventHandler<HTMLFormElement> = event => {
+        event.preventDefault();
+
+        console.info("fields", formFields);
+    };
+
+    const getFieldName = (name: keyof FormFields): string => name;
+
+    return (
+        <form className="registration-container" onSubmit={onFormSubmit}>
+            <LoginOptionsView setOption={props.setOption} option={props.option} />
+            <div className="container user-details-container">
+                <UsernameComponent
+                    onChange={onFieldChange}
+                    name={getFieldName("username")}
+                    value={formFields.username}
+                    fieldStatus={validFields.username}
+                />
+                <PasswordComponent
+                    name={getFieldName("password")}
+                    value={formFields.password}
+                    onChange={onFieldChange}
+                    fieldStatus={validFields.password}
+                />
+                <div className="tos-button">
+                    <div className="tos">
+                        <a href="https://passport.twitch.tv/password_resets/new?client_id=kimne78kx3ncx6brgo4mv6wki5h1ko">
+                            Trouble logging in?
+                        </a>
                     </div>
+                    <input
+                        className={formValid ? "sign-up enabled" : "sign-up disabled"}
+                        type="submit"
+                        value="Log In"
+                        disabled={!formValid}
+                    />
                 </div>
-            </form>
-        );
-    }
-}
+            </div>
+        </form>
+    );
+};

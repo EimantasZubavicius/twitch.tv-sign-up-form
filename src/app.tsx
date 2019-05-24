@@ -1,14 +1,11 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom";
-
-import { TwitchForm } from "./components/twitch-form/twitch-form";
+import React from "react";
+import ReactDOM from "react-dom";
 
 import "./shared/styles/main.scss";
+import { TwitchForm } from "./components/twitch-form/twitch-form";
 
-class App extends React.Component {
-    public render(): JSX.Element {
-        return <TwitchForm />;
-    }
-}
+export const App = (): JSX.Element => {
+  return <TwitchForm />;
+};
 
 ReactDOM.render(<App />, document.getElementById("root"));
