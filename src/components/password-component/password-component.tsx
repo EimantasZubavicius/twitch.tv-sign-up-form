@@ -4,6 +4,7 @@ import classNames from "classnames";
 import { PasswordProgressBar } from "../password-progress-bar/password-progress-bar";
 import { FieldStatus } from "../../shared/contracts/field-status";
 import { SignOptions } from "../../shared/contracts/signup-options";
+import { FieldError } from "@modules/forms";
 
 interface Props {
     onChange: React.ChangeEventHandler<HTMLInputElement>;
@@ -11,6 +12,7 @@ interface Props {
     name: string;
     fieldStatus: FieldStatus;
     option?: SignOptions;
+    error?: FieldError;
 }
 
 export const PasswordComponent = (props: Props): JSX.Element => {
@@ -46,7 +48,8 @@ export const PasswordComponent = (props: Props): JSX.Element => {
     };
 
     const inputDescription = <div>Strong passwords include a mix of lower case letters, upper case letters, and special characters.</div>;
-    const errorMessage = <div className="error-message">*Passwords must be at least 8 characters long.</div>;
+    const errorMessage = <div className="error-message">{props.error && props.error.message}</div>;
+    const isFieldIncorrect = props.fieldStatus === FieldStatus.Incorrect && props.error;
 
     return (
         <div className="parameter password">
@@ -58,7 +61,7 @@ export const PasswordComponent = (props: Props): JSX.Element => {
                 <input
                     type="password"
                     className={classNames("input-field full-width password-input", {
-                        wrong: props.fieldStatus === FieldStatus.Incorrect
+                        wrong: isFieldIncorrect
                     })}
                     onChange={onInputChange}
                     value={props.value}
@@ -79,9 +82,9 @@ export const PasswordComponent = (props: Props): JSX.Element => {
                 </div>
             </div>
             {props.option === SignOptions.SignUp ? (
-                <div className={classNames("animation-target", { full: focused })}>
-                    <div className={classNames("hidden-text", { nonhidden: focused })}>
-                        {props.fieldStatus === FieldStatus.Incorrect ? errorMessage : inputDescription}
+                <div className={classNames("animation-target", { full: focused || isFieldIncorrect })}>
+                    <div className={classNames("hidden-text", { nonhidden: focused || isFieldIncorrect })}>
+                        {isFieldIncorrect ? errorMessage : inputDescription}
                     </div>
                 </div>
             ) : null}

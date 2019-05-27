@@ -3,7 +3,7 @@ import classNames from "classnames";
 
 import { FieldStatus } from "../../shared/contracts/field-status";
 import { SignOptions } from "../../shared/contracts/signup-options";
-import { FieldError } from "src/shared/helpers/hooks";
+import { FieldError } from "@modules/forms";
 
 interface Props {
     onChange: React.ChangeEventHandler<HTMLInputElement>;
@@ -31,21 +31,21 @@ export const UsernameComponent: React.FC<Props> = props => {
     };
 
     const inputDescription = <div>This is the name people will know you by on this website. You can always change it later.</div>;
-    const errorMessageText = (props.error && props.error.message) || "*This username is unavailable.";
-    const errorMessage = <div className="error-message">{errorMessageText}</div>;
+    const errorMessage = <div className="error-message">{props.error && props.error.message}</div>;
+    const isFieldIncorrect = props.fieldStatus === FieldStatus.Incorrect && props.error;
 
     return (
         <div className="parameter username">
             <div className="username-label-wrapper label-wrapper">
                 <div className="username-label label">Username</div>
                 {props.option === SignOptions.SignUp ? (
-                    props.fieldStatus === FieldStatus.Correct ? (
+                    !props.error ? (
                         <div className="fas fa-check-circle icon strong" />
                     ) : null
                 ) : null}
             </div>
             <input
-                className={classNames("input-field date username-input", { wrong: props.fieldStatus === FieldStatus.Incorrect })}
+                className={classNames("input-field date username-input", { wrong: isFieldIncorrect })}
                 name={props.name}
                 onChange={onInputChange}
                 value={props.value}
@@ -53,9 +53,9 @@ export const UsernameComponent: React.FC<Props> = props => {
                 onBlur={onInputBlur}
             />
             {props.option === SignOptions.SignUp ? (
-                <div className={classNames("animation-target", { full: focused })}>
-                    <div className={classNames("hidden-text", { nonhidden: focused })}>
-                        {props.fieldStatus === FieldStatus.Incorrect ? errorMessage : inputDescription}
+                <div className={classNames("animation-target", { full: focused || isFieldIncorrect })}>
+                    <div className={classNames("hidden-text", { nonhidden: focused || isFieldIncorrect })}>
+                        {isFieldIncorrect ? errorMessage : inputDescription}
                     </div>
                 </div>
             ) : null}
