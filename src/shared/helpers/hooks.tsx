@@ -15,8 +15,9 @@ export interface FieldValidator<TValue> {
 
 export function useField<TValue>(
     initialValue: TValue,
-    validation: FieldValidator<TValue>): [FieldState<TValue>, (value: FieldState<TValue>) => void] {
-    const [field, setField] = useState<FieldState<TValue>>({value: initialValue, error: undefined});
+    validation: FieldValidator<TValue>
+): [FieldState<TValue>, (value: FieldState<TValue>) => void] {
+    const [field, setField] = useState<FieldState<TValue>>({ value: initialValue, error: undefined });
 
     const fieldSetter = (fieldState: FieldState<TValue>): void => {
         const nextFieldState = {
