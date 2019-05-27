@@ -28,3 +28,14 @@ export interface Form {
     resetError: () => void;
     submit: () => void;
 }
+
+export interface FormDate {
+    year: string;
+    month: string;
+    day: string;
+}
+
+export interface ServerResponse {
+    statusCode: number;
+    errorMessage?: string;
+}

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { useField, useForm } from "@modules/forms";
+import { useField, useForm, FormDate } from "@modules/forms";
 
 import { DateComponent } from "../date-component/date-component";
 import { EmailComponent } from "../email-component/email-component";
@@ -8,15 +8,10 @@ import { LoginOptionsView } from "../options-component/options-component";
 import { UsernameComponent } from "../username-component/username-component";
 import { PasswordComponent } from "../password-component/password-component";
 import { FieldStatus } from "../../shared/contracts/field-status";
-import {
-    isMonthValid,
-    isDayValid,
-    isYearValid,
-    isEmailValid,
-    isUsernameOrPasswordValid
-} from "../../shared/helpers/registration-form-helpers";
+import { isEmailValid, isUsernameOrPasswordValid, isDateValid } from "../../shared/helpers/registration-form-helpers";
 import { SignOptions } from "../../shared/contracts/signup-options";
 import classNames from "classnames";
+import { UserDto } from "src/shared/contracts/user-dto";
 
 type Dictionary<TFields, TValue> = { [TKey in keyof TFields]: TValue };
 
@@ -27,9 +22,7 @@ interface Props {
 
 export const RegistrationFormView = (props: Props): JSX.Element => {
     const [validFields, setValidFields] = useState<Dictionary<UserDto, FieldStatus>>({
-        day: FieldStatus.Initialized,
-        month: FieldStatus.Initialized,
-        year: FieldStatus.Initialized,
+        date: FieldStatus.Initialized,
         email: FieldStatus.Initialized,
         password: FieldStatus.Initialized,
         username: FieldStatus.Initialized
@@ -81,54 +74,40 @@ export const RegistrationFormView = (props: Props): JSX.Element => {
         }
     });
 
-    const [year, setYear] = useField<string>("", value => {
-        switch (isYearValid(value)) {
-            case FieldStatus.Initialized:
-                return {
-                    message: "Cannot be empty."
-                };
-            case FieldStatus.Incorrect:
-                return {
-                    message: "Incorrect year entered."
-                };
+    const [date, setDate] = useField<FormDate>(
+        {
+            year: "",
+            month: "0",
+            day: ""
+        },
+        value => {
+            switch (isDateValid(value)) {
+                case FieldStatus.Incorrect:
+                    return {
+                        message: "Incorrect date entered."
+                    };
+
+                case FieldStatus.Initialized:
+                    return {
+                        message: "No date enetered."
+                    };
+            }
         }
-    });
+    );
 
-    const [month, setMonth] = useField<string>("0", value => {
-        if (isMonthValid(value) === FieldStatus.Incorrect) {
-            return {
-                message: "No month selected."
-            };
-        }
-    });
-
-    const [day, setDay] = useField<string>("", value => {
-        switch (isDayValid(value, month.value, year.value)) {
-            case FieldStatus.Incorrect:
-                return {
-                    message: "Incorrect day entered."
-                };
-
-            case FieldStatus.Initialized:
-                return {
-                    message: "No day entered."
-                };
-        }
-    });
-
-    const fieldSetters: { [TKey in keyof UserDto]: (value: string) => void } = {
+    const fieldSetters: { [key: string]: (value: string) => void } = {
         username: setUsername,
         password: setPassword,
         email: setEmail,
-        day: setDay,
-        month: setMonth,
-        year: setYear
+        day: value => setDate({ ...date.value, day: value }),
+        month: value => setDate({ ...date.value, month: value }),
+        year: value => setDate({ ...date.value, year: value })
     };
 
     const form = useForm(() => {
-        console.info("form", [username, password, email, year, month, day]);
-        return Promise.resolve(undefined);
-    }, [username, password, email, year, month, day]);
+        console.info("form", [username, password, email, date]);
+        return Promise.resolve({ message: "Big bad error" });
+    }, [username, password, email, date]);
 
     const handleFieldChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const fieldName = event.currentTarget.name;
@@ -146,15 +125,13 @@ export const RegistrationFormView = (props: Props): JSX.Element => {
         const nextValidFields: Dictionary<UserDto, FieldStatus> = {
             username: isUsernameOrPasswordValid(username.value, 3),
             password: isUsernameOrPasswordValid(password.value, 7),
-            month: isMonthValid(month.value),
-            day: isDayValid(day.value, month.value, year.value),
-            year: isYearValid(year.value),
+            date: isDateValid(date.value),
             email: isEmailValid(email.value)
         };
 
         setValidFields(nextValidFields);
 
-        console.info("fields", { username, password, email, year, month, day });
+        console.info("fields", { username, password, email, date });
         form.submit();
     };
 
@@ -192,12 +169,10 @@ export const RegistrationFormView = (props: Props): JSX.Element => {
                     dayInputName={getFieldName("day")}
                     monthInputName={getFieldName("month")}
                     yearInputName={getFieldName("year")}
-                    dayValue={day.value}
-                    monthValue={month.value}
-                    yearValue={year.value}
-                    dayFieldStatus={statusWrapper(validFields.day)}
-                    monthFieldStatus={statusWrapper(validFields.month)}
-                    yearFieldStatus={statusWrapper(validFields.year)}
+                    value={date.value}
+                    fieldStatus={statusWrapper(validFields.date)}
+                    isFormSubmitted={form.state.submitClicked}
+                    error={date.error}
                 />
                 <EmailComponent
                     name={getFieldName("email")}
@@ -216,7 +191,9 @@ export const RegistrationFormView = (props: Props): JSX.Element => {
                     <input className="sign-up enabled" type="submit" value="Sign Up" onClick={onFormSubmit} />
                     {form.state.error ? (
                         <div className={classNames("animation-target", { full: true })}>
-                            <div className={classNames("hidden-text", { nonhidden: true })}>{form.state.error.message}</div>
+                            <div className={classNames("hidden-text", { nonhidden: true })}>
+                                <div className="error-message">{form.state.error.message}</div>
+                            </div>
                         </div>
                     ) : null}
                 </div>

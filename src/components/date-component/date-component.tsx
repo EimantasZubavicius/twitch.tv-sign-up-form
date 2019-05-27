@@ -3,19 +3,19 @@ import classNames from "classnames";
 
 import { Months } from "../../shared/contracts/months";
 import { FieldStatus } from "../../shared/contracts/field-status";
+import { FieldError, FormDate } from "@modules/forms";
+import { isMonthValid, isDayValid, isYearValid } from "src/shared/helpers/registration-form-helpers";
 
 interface Props {
     onInputChange: React.ChangeEventHandler<HTMLInputElement>;
     onSelectChange: React.ChangeEventHandler<HTMLSelectElement>;
-    dayFieldStatus: FieldStatus;
-    monthFieldStatus: FieldStatus;
-    yearFieldStatus: FieldStatus;
-    dayValue: string;
-    monthValue: string;
-    yearValue: string;
+    value: FormDate;
     dayInputName: string;
     monthInputName: string;
     yearInputName: string;
+    fieldStatus: FieldStatus;
+    isFormSubmitted: boolean;
+    error?: FieldError;
 }
 
 export const DateComponent = (props: Props): JSX.Element => {
@@ -48,7 +48,8 @@ export const DateComponent = (props: Props): JSX.Element => {
         ));
     };
 
-    const errorMessage = <div className="error-message">*Please enter a valid date.</div>;
+    const errorMessage = <div className="error-message">{props.error && props.error.message}</div>;
+    const isFieldIncorrect = props.fieldStatus === FieldStatus.Incorrect && props.error;
 
     return (
         <div className="parameter date-of-birth">
@@ -59,7 +60,7 @@ export const DateComponent = (props: Props): JSX.Element => {
                 <select
                     onChange={onSelectChange}
                     className={classNames("input-field date month-input", {
-                        wrong: props.monthFieldStatus === FieldStatus.Incorrect
+                        wrong: isMonthValid(props.value.month) !== FieldStatus.Correct && props.isFormSubmitted
                     })}
                     name={props.monthInputName}
                 >
@@ -70,10 +71,12 @@ export const DateComponent = (props: Props): JSX.Element => {
                 </select>
                 <div className="quarter-width date wrapper">
                     <input
-                        className={classNames("input-field date day", { wrong: props.dayFieldStatus === FieldStatus.Incorrect })}
+                        className={classNames("input-field date day", {
+                            wrong: isDayValid(props.value) !== FieldStatus.Correct && props.isFormSubmitted
+                        })}
                         placeholder="Day"
                         onChange={onInputChange}
-                        value={props.dayValue}
+                        value={props.value.day}
                         name={props.dayInputName}
                         onFocus={onFocus}
                         onBlur={onBlur}
@@ -82,22 +85,20 @@ export const DateComponent = (props: Props): JSX.Element => {
                 <div className="day-wrapper quarter-width date wrapper">
                     <input
                         className={classNames("input-field date year", {
-                            wrong: props.yearFieldStatus === FieldStatus.Incorrect
+                            wrong: isYearValid(props.value.year) !== FieldStatus.Correct && props.isFormSubmitted
                         })}
                         placeholder="Year"
                         onChange={onInputChange}
-                        value={props.yearValue}
+                        value={props.value.year}
                         name={props.yearInputName}
                         onFocus={onFocus}
                         onBlur={onBlur}
                     />
                 </div>
             </div>
-            {props.dayFieldStatus === FieldStatus.Incorrect ||
-            props.monthFieldStatus === FieldStatus.Incorrect ||
-            props.yearFieldStatus === FieldStatus.Incorrect ? (
-                <div className={classNames("animation-target", { full: focused })}>
-                    <div className={classNames("hidden-text", { nonhidden: focused })}>{errorMessage}</div>
+            {isFieldIncorrect ? (
+                <div className={classNames("animation-target", { full: focused || isFieldIncorrect })}>
+                    <div className={classNames("hidden-text", { nonhidden: focused || isFieldIncorrect })}>{errorMessage}</div>
                 </div>
             ) : null}
         </div>

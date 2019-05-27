@@ -1,5 +1,6 @@
 import { PasswordStrength } from "../contracts/password-strength";
 import { FieldStatus } from "../contracts/field-status";
+import { FormDate } from "@modules/forms";
 
 export const MONTHS_LENGTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 export const LEAP_YEAR_MONTHS_LENGTH = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -36,10 +37,26 @@ export function isMonthValid(value: string): FieldStatus {
     }
 }
 
-export function isDayValid(dayValue: string, monthValue: string, yearValue: string): FieldStatus {
-    const month = parseInt(monthValue);
-    const day = parseInt(dayValue);
-    const year = parseInt(yearValue);
+export function isDateValid(date: FormDate): FieldStatus {
+    const yearValidity = isYearValid(date.year);
+    const monthValidity = isMonthValid(date.month);
+    const dayValidity = isDayValid(date);
+
+    if (yearValidity === FieldStatus.Correct && monthValidity === FieldStatus.Correct && dayValidity === FieldStatus.Correct) {
+        return FieldStatus.Correct;
+    }
+
+    if (yearValidity === FieldStatus.Initialized && monthValidity === FieldStatus.Initialized && dayValidity === FieldStatus.Initialized) {
+        return FieldStatus.Initialized;
+    }
+
+    return FieldStatus.Incorrect;
+}
+
+export function isDayValid(date: FormDate): FieldStatus {
+    const month = parseInt(date.month);
+    const day = parseInt(date.day);
+    const year = parseInt(date.year);
     let MONTHS;
 
     if (year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0)) {
@@ -47,7 +64,7 @@ export function isDayValid(dayValue: string, monthValue: string, yearValue: stri
     } else {
         MONTHS = MONTHS_LENGTH;
     }
-    if (dayValue.length !== 0) {
+    if (date.day.length !== 0) {
         if (!isNaN(day) && day <= MONTHS[month - 1] && day > 0) {
             return FieldStatus.Correct;
         } else {
@@ -62,7 +79,7 @@ export function isYearValid(value: string): FieldStatus {
     const year = parseInt(value);
 
     if (value.length !== 0) {
-        if (!isNaN(year) && year > 1903 && year < 2019) {
+        if (!isNaN(year) && year > 1903 && year <= new Date().getFullYear()) {
             return FieldStatus.Correct;
         } else {
             return FieldStatus.Incorrect;
