@@ -3,6 +3,7 @@ import classNames from "classnames";
 
 import { FieldStatus } from "../../shared/contracts/field-status";
 import { SignOptions } from "../../shared/contracts/signup-options";
+import { FieldError } from "src/shared/helpers/hooks";
 
 interface Props {
     onChange: React.ChangeEventHandler<HTMLInputElement>;
@@ -10,6 +11,7 @@ interface Props {
     name: string;
     fieldStatus: FieldStatus;
     option?: SignOptions;
+    error?: FieldError;
 }
 
 export const UsernameComponent: React.FC<Props> = props => {
@@ -29,7 +31,8 @@ export const UsernameComponent: React.FC<Props> = props => {
     };
 
     const inputDescription = <div>This is the name people will know you by on this website. You can always change it later.</div>;
-    const errorMessage = <div className="error-message">*This username is unavailable.</div>;
+    const errorMessageText = (props.error && props.error.message) || "*This username is unavailable.";
+    const errorMessage = <div className="error-message">{errorMessageText}</div>;
 
     return (
         <div className="parameter username">

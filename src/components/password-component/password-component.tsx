@@ -41,8 +41,6 @@ export const PasswordComponent = (props: Props): JSX.Element => {
         }
     };
 
-    // const element: HTMLInputElement | null = null;
-
     const onEyeClick: React.Ref<HTMLInputElement> = el => {
         setElement(el);
     };

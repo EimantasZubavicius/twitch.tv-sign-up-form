@@ -14,6 +14,7 @@ import {
     isUsernameOrPasswordValid
 } from "../../shared/helpers/registration-form-helpers";
 import { SignOptions } from "../../shared/contracts/signup-options";
+import { useField } from "src/shared/helpers/hooks";
 
 type Dictionary<TFields, TValue> = { [TKey in keyof TFields]: TValue };
 
@@ -49,6 +50,15 @@ export const RegistrationFormView = (props: Props): JSX.Element => {
         username: ""
     });
     const [formValid, setFormValid] = useState(false);
+    const [hookedUsername, setHookedUsername] = useField<string>("", (value: string) => {
+        if (value.length < 4) {
+            return {
+                message: "Cannot be below 4 characters."
+            };
+        }
+
+        return undefined;
+    });
 
     const onFieldChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const fieldName = event.currentTarget.name;
@@ -72,9 +82,14 @@ export const RegistrationFormView = (props: Props): JSX.Element => {
 
         setFormValid(
             Object.keys(nextValidFields)
-            .map(x => nextValidFields[x])
-            .every(x => x === FieldStatus.Correct)
+                .map(x => nextValidFields[x])
+                .every(x => x === FieldStatus.Correct)
         );
+    };
+
+    const onHookedUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.currentTarget.value;
+        setHookedUsername({ value: value });
     };
 
     const onFormSubmit: React.MouseEventHandler<HTMLFormElement> = event => {
@@ -94,6 +109,14 @@ export const RegistrationFormView = (props: Props): JSX.Element => {
                     name={getFieldName("username")}
                     value={formFields.username}
                     fieldStatus={validFields.username}
+                    option={props.option}
+                />
+                <UsernameComponent
+                    name="hooked-username"
+                    value={hookedUsername.value}
+                    onChange={onHookedUsernameChange}
+                    fieldStatus={hookedUsername.error ? FieldStatus.Incorrect : FieldStatus.Initialized}
+                    error={hookedUsername.error}
                     option={props.option}
                 />
                 <PasswordComponent
